@@ -5,10 +5,10 @@ const jwt = require('jsonwebtoken')
 const authLockedRoute = require('./authLockedRoute')
 
 
-// GET /users - test endpoint
-router.get('/', (req, res) => {
-  res.json({ msg: 'welcome to the users endpoint' })
-})
+// // GET /users - test endpoint
+// router.get('/', (req, res) => {
+//   res.json({ msg: 'welcome to the users endpoint' })
+// })
 
 // POST /users/register - CREATE new user
 router.post('/register', async (req, res) => {
@@ -28,9 +28,13 @@ router.post('/register', async (req, res) => {
   
     // create new user
     const newUser = new db.User({
-      name: req.body.name,
+      username: req.body.username,
       email: req.body.email,
-      password: hashedPassword
+      password: hashedPassword,
+      image: req.body.image,
+      type: req.body.type,
+      private: req.body.private,
+      bio: req.body.bio      
     })
   
     await newUser.save()
@@ -90,9 +94,63 @@ router.post('/login', async (req, res) => {
 
 
 // GET /auth-locked - will redirect if bad jwt token is found
-router.get('/auth-locked', authLockedRoute, (req, res) => {
+router.get('/:username', async (req, res) => {
   // you will have access to the user on the res.local.user
-  res.json( { msg: 'welcome to the private route!' })
+  try {
+    const profile = await db.User.findOne({
+      username: req.params.username
+    }).populate('posts')
+
+    res.json(profile)
+  } catch(err) {
+    console.log(err)
+    res.status(500).json({ msg: 'server error'  })
+  }
 })
+
+// POST /auth-locked - will redirect if bad jwt token is found
+router.post('/:username', authLockedRoute, async (req, res) => {
+  // you will have access to the user on the res.local.user
+  try {
+    const newFriend = await db.User.findOne({
+      username: req.params.username
+    })
+       
+    res.locals.user.friends.push(newFriend)
+    
+    await res.locals.user.save()
+    
+    const user = res.locals.user.populate('friends')
+
+    res.json(user)
+
+  } catch(err) {
+    console.log(err)
+    res.status(500).json({ msg: 'server error'  })
+  }
+})
+
+router.put('/:username/editprofile', authLockedRoute, async (req, res) => {
+  try {
+    const options = {new: true} 
+    const updatedUser = await db.User.findOneAndUpdate({ username: req.params.username}, req.body, options)
+    res.json(updatedUser)
+  }catch(err) {
+    console.warn(err)
+    res.status(500).json({ msg: 'server error'  })
+  }
+})
+
+router.delete('/:username', authLockedRoute, async (req, res) => {
+  try {
+    await db.User.findOneAndDelete({ username: req.params.username })
+    res.sendStatus(204)
+  }catch(err) {
+    console.warn(err)
+    res.status(500).json({ msg: 'server error'  })
+  }
+})
+
+
 
 module.exports = router
