@@ -2,7 +2,7 @@
 const mongoose = require('mongoose')
 
 const UserSchema = new mongoose.Schema({
-  name: {
+  username: {
     type: String
   },
   email: {
@@ -10,7 +10,32 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String
-  }
+  },
+  image: {
+    type: String
+  },
+  type: {
+    type: String
+  },
+  bio: {
+    type: String
+  },
+  private: {
+    type: Boolean
+  },
+  friends: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  posts: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Post'
+  }],
+  likedposts: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Post'
+  }]
+
 }, {
   timestamps: true
 })

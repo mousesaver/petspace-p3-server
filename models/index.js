@@ -2,7 +2,7 @@
 const mongoose = require("mongoose")
 require('dotenv').config()
 // here is where you can update your database name
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1/mernAuth'
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1/petspace'
 
 mongoose.connect(MONGODB_URI)
 
