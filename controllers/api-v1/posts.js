@@ -26,6 +26,8 @@ router.post('/', async (req, res) => {
   try {
     // create new user
     const newPost = await db.Post.create(req.body)
+    newPost.user = res.locals.user
+    await newPost.save()
     res.status(201).json(newPost)
   } catch (error) {
     console.log(error)
@@ -71,7 +73,9 @@ router.post('/:postid/comment', async (req, res) => {
       // create new user
     //   const newComment = {content: req.body.content, user: req.body.user}
       const post = await db.Post.findById(req.params.postid)
-      post.comments.push(req.body)
+      const comment = req.body
+      comment.user = res.locals.user
+      post.comments.push(comment)
       await post.save()
       res.status(201).json(post)
     } catch (error) {
