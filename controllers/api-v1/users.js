@@ -99,7 +99,7 @@ router.get('/:username', async (req, res) => {
   try {
     const profile = await db.User.findOne({
       username: req.params.username
-    }).populate('posts')
+    }).populate({path: 'posts'})
 
     res.json(profile)
   } catch(err) {
