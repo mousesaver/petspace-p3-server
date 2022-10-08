@@ -25,9 +25,10 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     // create new user
+    const user = await db.User.findById(req.body.userId)
     const newPost = await db.Post.create({
         content: req.body.content,
-        user: req.body.user})
+        user: user})
     res.status(201).json(newPost)
   } catch (error) {
     console.log(error)
