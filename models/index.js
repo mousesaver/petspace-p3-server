@@ -1,4 +1,5 @@
 // require mongoose package
+
 const mongoose = require("mongoose")
 require('dotenv').config()
 // here is where you can update your database name

@@ -1,16 +1,23 @@
 const router = require('express').Router()
 const db = require('../../models')
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
-const authLockedRoute = require('./authLockedRoute')
+
 
 
 // GET /posts - test endpoint
 router.get('/', async (req, res) => {
     //find all friends
+    if (res.locals.user) {
+        const friends = await res.locals.user.friends.concat(res.locals.user).populate({path: 'posts'})
+        const posts = []
+        friends.forEach((friend) => {
+            posts.concat(friend.posts)
+        })
+    } else {
+        posts = await db.Post.find()
+    }
     // const friends = res.locals.user.friends
     // const post = friends
-    const posts = await db.Post.find()
+    posts.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
     res.json(posts)
 })
 
