@@ -41,7 +41,7 @@ router.post('/register', async (req, res) => {
 
     // create jwt payload
     const payload = {
-      name: newUser.name,
+      username: newUser.username,
       email: newUser.email, 
       id: newUser.id
     }
@@ -77,7 +77,7 @@ router.post('/login', async (req, res) => {
 
     // create jwt payload
     const payload = {
-      name: foundUser.name,
+      username: foundUser.username,
       email: foundUser.email, 
       id: foundUser.id
     }
@@ -130,7 +130,7 @@ router.post('/:username', authLockedRoute, async (req, res) => {
   }
 })
 
-router.put('/:username/editprofile', authLockedRoute, async (req, res) => {
+router.put('/:username/edit', authLockedRoute, async (req, res) => {
   try {
     const options = {new: true} 
     const updatedUser = await db.User.findOneAndUpdate({ username: req.params.username}, req.body, options)
