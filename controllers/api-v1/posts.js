@@ -29,6 +29,8 @@ router.post('/', async (req, res) => {
     const newPost = await db.Post.create({
         content: req.body.content,
         user: user})
+    user.posts.push(newPost)
+    await user.save()
     res.status(201).json(newPost)
   } catch (error) {
     console.log(error)
