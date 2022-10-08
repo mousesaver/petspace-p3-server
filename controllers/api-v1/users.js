@@ -5,10 +5,11 @@ const jwt = require('jsonwebtoken')
 const authLockedRoute = require('./authLockedRoute')
 
 
-// // GET /users - test endpoint
-// router.get('/', (req, res) => {
-//   res.json({ msg: 'welcome to the users endpoint' })
-// })
+// GET /users - test endpoint
+router.get('/', async (req, res) => {
+  const allUsers = await db.User.find({})
+  res.json(allUsers)
+})
 
 // POST /users/register - CREATE new user
 router.post('/register', async (req, res) => {
@@ -84,7 +85,7 @@ router.post('/login', async (req, res) => {
 
     // sign jwt and send back
     const token = await jwt.sign(payload, process.env.JWT_SECRET)
-
+    
     res.json({ token })
   } catch(error) {
     console.log(error)
@@ -130,7 +131,7 @@ router.post('/:username', authLockedRoute, async (req, res) => {
   }
 })
 
-router.put('/:username/edit', authLockedRoute, async (req, res) => {
+router.put('/:username/edit', async (req, res) => {
   try {
     const options = {new: true} 
     const updatedUser = await db.User.findOneAndUpdate({ username: req.params.username}, req.body, options)
@@ -141,7 +142,7 @@ router.put('/:username/edit', authLockedRoute, async (req, res) => {
   }
 })
 
-router.delete('/:username', authLockedRoute, async (req, res) => {
+router.delete('/:username',  async (req, res) => {
   try {
     await db.User.findOneAndDelete({ username: req.params.username })
     res.sendStatus(204)
