@@ -7,7 +7,7 @@ const db = require('../../models')
 router.get('/', async (req, res) => {
     //find all friends
     if (res.locals.user) {
-        const friends = await res.locals.user.friends.concat(res.locals.user).populate({path: 'posts'})
+        const friends = await res.locals.user.friends.concat(res.locals.user).populate('posts')
         const posts = []
         friends.forEach((friend) => {
             posts.concat(friend.posts)
