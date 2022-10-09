@@ -95,7 +95,7 @@ router.post('/login', async (req, res) => {
 
 
 // GET /auth-locked - will redirect if bad jwt token is found
-router.get('/:username', async (req, res) => {
+router.get('/:username', authLockedRoute, async (req, res) => {
   // you will have access to the user on the res.local.user
   try {
     const profile = await db.User.findOne({
@@ -110,20 +110,24 @@ router.get('/:username', async (req, res) => {
 })
 
 // POST /auth-locked - will redirect if bad jwt token is found
-router.post('/:username', authLockedRoute, async (req, res) => {
+router.post('/:username', async (req, res) => {
   // you will have access to the user on the res.local.user
   try {
     const newFriend = await db.User.findOne({
       username: req.params.username
     })
-       
-    res.locals.user.friends.push(newFriend)
-    
-    await res.locals.user.save()
-    
-    const user = res.locals.user.populate('friends')
 
-    res.json(user)
+    const currentUser = await db.User.findById(req.body.id)
+
+    currentUser.following.push(newFriend)
+    
+    currentUser.save()
+
+    newFriend.followers.push(currentUser)
+
+    newFriend.save()
+
+    res.json(currentUser)
 
   } catch(err) {
     console.log(err)
@@ -142,7 +146,7 @@ router.put('/:username/edit', async (req, res) => {
   }
 })
 
-router.delete('/:username',  async (req, res) => {
+router.delete('/:username', async (req, res) => {
   try {
     await db.User.findOneAndDelete({ username: req.params.username })
     res.sendStatus(204)
