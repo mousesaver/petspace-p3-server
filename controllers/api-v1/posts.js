@@ -6,14 +6,15 @@ const db = require('../../models')
 // GET /posts - test endpoint
 router.get('/', async (req, res) => {
     //find all friends
-    const user = await db.User.findById(req.headers.userid)
-    const friends = await user.friends.concat(user).populate('posts')
-    const posts = []
-    friends.forEach((friend) => {
-        posts.concat(friend.posts)
+    const user = await db.User.findById(req.headers.userid).populate('friends')
+    const friendsAndUser = user.friends.concat(user)
+    friendsAndUser.forEach((people) =>{
+          people.populate('posts')
+    }) 
+    let posts = []
+    friendsAndUser.forEach((friend) => {
+        posts = posts.concat(friend.posts)
     })
-    // const friends = res.locals.user.friends
-    // const post = friends
     posts.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
     res.json(posts)
 })
