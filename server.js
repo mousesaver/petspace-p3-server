@@ -4,7 +4,11 @@ const express = require('express')
 const cors = require('cors')
 const rowdy = require('rowdy-logger')
 const authLockedRoute = require('./controllers/api-v1/authLockedRoute')
+const { unlinkSync } = require('fs')
+const path = require('path')
+const multer = require('multer')
 const { cloudinary } = require('./utils/cloudinary')
+
 
 // config express app
 const app = express()
@@ -13,13 +17,17 @@ const PORT = process.env.PORT || 3001
 const rowdyResults = rowdy.begin(app)
 // cross origin resource sharing 
 app.use(cors())
+app.use(express.static('uploads'))
 // request body parsing
 app.use(express.urlencoded({ limit: "50mb",extended: false })) // optional added file size limit
 app.use(express.json({ limit: "50mb" })) //Added a file size limit to 50mb
 
-const fileupload = require('express-fileupload'); 
+// const fileupload = require('express-fileupload'); 
 
-app.use(fileupload({useTempFiles: true}))
+// app.use(fileupload({useTempFiles: true}))
+
+// config for multer
+const uploads = multer({ dest: 'uploads/' })
 
 const myMiddleWare = (req, res, next) => {
   console.log('hello from a middleware')
