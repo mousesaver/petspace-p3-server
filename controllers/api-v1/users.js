@@ -154,18 +154,20 @@ router.post('/:username', async (req, res) => {
 
 router.put('/:username/edit', async (req, res) => {
   try {
+    console.log(req.body)
     const options = {new: true} 
     const updatedUser = await db.User.findOneAndUpdate({ username: req.params.username}, req.body, options)
     res.json(updatedUser)
+    console.log(updatedUser)
   }catch(err) {
     console.warn(err)
     res.status(500).json({ msg: 'server error'  })
   }
 })
 
-router.delete('/:username', async (req, res) => {
+router.delete('/:username', authLockedRoute, async (req, res) => {
   try {
-    await db.User.findOneAndDelete({ username: req.params.username })
+    await db.User.findByIdAndDelete(res.locals.user.id)
     res.sendStatus(204)
   }catch(err) {
     console.warn(err)
