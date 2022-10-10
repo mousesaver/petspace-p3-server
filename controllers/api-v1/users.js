@@ -119,7 +119,7 @@ router.post('/:username', async (req, res) => {
     })
 
     const currentUser = await db.User.findById(req.body.currentUser.id)
-  
+
     // console.log(req.body)
     // if status===true, currentUser is 'unfollowing' a friend
     if (req.body.status === true) {
