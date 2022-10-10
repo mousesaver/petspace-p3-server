@@ -46,6 +46,22 @@ router.get('/:postid', async (req, res) => {
     }
 })
 
+// Like a post
+router.post('/:postid/like', async (req, res) => {
+    try {
+        const post = await db.Post.findById(req.params.postid)
+        const user = await db.User.findById(req.body.userId)
+        const like = await db.Like.create({
+            user: user
+        })
+        post.likes.push(like)
+        await post.save()
+        res.json(post)
+    } catch(err) {
+        console.log(err)
+        res.status(500).json({ msg: 'server error'  })
+    }
+})
 // PUT /:postid 
 router.put('/:postid', async (req, res) => {
     try {
