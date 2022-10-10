@@ -51,6 +51,7 @@ router.get('/:postid', async (req, res) => {
 
 // PUT /:postid 
 router.put('/:postid', async (req, res) => {
+    console.log(req.body)
     try {
         const options = {new: true}
         const updatedPost = await db.Post.findByIdAndUpdate(req.params.postid, req.body, options)
