@@ -22,5 +22,5 @@
     "morgan": "^1.10.0",
     "rowdy-logger": "^1.0.2"
   },
-  "proxy": "http://localhost:3001"
+  "proxy": "http://localhost:3000"
 }
