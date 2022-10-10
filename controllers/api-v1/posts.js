@@ -5,18 +5,20 @@ const db = require('../../models')
 
 // GET /posts - test endpoint
 router.get('/', async (req, res) => {
-    //find all friends
-    const user = await db.User.findById(req.headers.userid).populate('friends')
-    const friendsAndUser = user.friends.concat(user)
-    friendsAndUser.forEach((people) =>{
-          people.populate('posts')
-    }) 
-    let posts = []
-    friendsAndUser.forEach((friend) => {
-        posts = posts.concat(friend.posts)
-    })
-    posts.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
-    res.json(posts)
+    try {
+        const user1 = await db.User.findById(req.headers.userid).populate('posts').populate({path: 'following', populate: {path: 'posts'}})
+        const friendsAndUser = user1.following.concat(user1)
+        let posts = []
+        friendsAndUser.forEach((people) => {
+            posts = posts.concat(people.posts)
+        })
+        posts.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
+        res.json(posts)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ msg: 'server error'  })
+    }
+    
 })
 
 // POST /users/register - CREATE new user
