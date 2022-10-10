@@ -113,21 +113,38 @@ router.get('/:username', authLockedRoute, async (req, res) => {
 router.post('/:username', async (req, res) => {
   // you will have access to the user on the res.local.user
   try {
-    const newFriend = await db.User.findOne({
+    console.log(req.body)
+    const friendUser = await db.User.findOne({
       username: req.params.username
     })
 
-    const currentUser = await db.User.findById(req.body.id)
+    const currentUser = await db.User.findById(req.body.currentUser.id)
 
-    currentUser.following.push(newFriend)
-    
-    currentUser.save()
+    // console.log(req.body)
+    // if status===true, currentUser is 'unfollowing' a friend
+    if (req.body.status === true) {
+      //remove currentUser from 'followers' of friendUser
+      friendUser.followers.splice(friendUser.followers.indexOf(currentUser.id),1)
+      friendUser.save()
+      // console.log(friendUser.followers)
 
-    newFriend.followers.push(currentUser)
+      //remove friendUser from currentUser's 'following'
+      currentUser.following.splice(currentUser.following.indexOf(friendUser.id),1)
+      currentUser.save()
+      // console.log(currentUser.following)
 
-    newFriend.save()
+    } else {
+      // if status === false, currentUser is 'following' a new friend
+      // add new friend as 'following' on currentUser
+      currentUser.following.push(friendUser)    
+      currentUser.save()
 
-    res.json(currentUser)
+      // add currentUser as 'followers' on new friend
+      friendUser.followers.push(currentUser)
+      friendUser.save()
+    }
+
+    res.json(friendUser)
 
   } catch(err) {
     console.log(err)
