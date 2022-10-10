@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const db = require('../../models')
 
+const { cloudinary } = require('../../utils/cloudinary')
 
 
 // GET /posts - test endpoint
@@ -26,6 +27,13 @@ router.post('/', async (req, res) => {
   try {
     // create new user
     const user = await db.User.findById(req.body.userId)
+    const fileStr = req.files.image.data
+    console.log(fileStr, " this is the file string")
+    const uploadedResponse = await cloudinary.uploader.upload(fileStr, {
+        upload_preset: 'dev_setups',
+    })
+    console.log(uploadedResponse)
+    res.json({ msg: 'yay' })
     const newPost = await db.Post.create({
         content: req.body.content,
         user: user})
