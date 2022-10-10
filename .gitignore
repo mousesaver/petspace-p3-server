@@ -24,4 +24,5 @@ yarn-error.log*
 node_modules
 .env
 
+papetspace-p3-client
 package-lock.json
