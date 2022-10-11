@@ -133,14 +133,25 @@ router.post('/:postid/comments', async (req, res) => {
       res.status(500).json({ msg: 'server error'  })
     }
 })
+router.get('/:postid/comments/:commentid', async (req, res) => {
+    try {
+        const post = await db.Post.findById(req.params.postid).populate('comments')
+        const index = post.comments.findIndex((comment) => {return comment.id === req.params.commentid})
+        post.comments[index]
+        res.json(post.comments[index])
+    } catch(err) {
+        console.log(err)
+        res.status(500).json({ msg: 'server error'  })
+    }
+})
 // PUT /:postid/comment/:commentid 
 router.put('/:postid/comments/:commentid', async (req, res) => {
     try {
         const post = await db.Post.findById(req.params.postid)
         const index = post.comments.findIndex((comment) => {return comment.id === req.params.commentid})
-        post.comments[index] = {...post.comments[index], content: req.body.content}
+        post.comments[index] = {_id: post.comments[index]._id,user: post.comments[index].user, content: req.body.content}
         await post.save()
-        res.json(post)
+        res.json(post.comments[index])
     } catch(err) {
         console.log(err)
         res.status(500).json({ msg: 'server error'  })
@@ -152,7 +163,7 @@ router.delete('/:postid/comments/:commentid', async (req, res) => {
         const index = post.comments.findIndex((comment) => {return comment.id === req.params.commentid})
         post.comments.splice(index, 1)
         await post.save()
-        res.sendStatus(204)
+        res.json(post)
     } catch(err) {
         console.log(err)
         res.status(500).json({ msg: 'server error'  })
