@@ -4,6 +4,11 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const authLockedRoute = require('./authLockedRoute')
 
+const { cloudinary } = require('../../utils/cloudinary')
+const multer = require('multer')
+const { unlinkSync } = require('fs')
+const uploads = multer({ dest: 'uploads/' })
+
 
 // GET /users - test endpoint
 router.get('/', async (req, res) => {
@@ -12,27 +17,33 @@ router.get('/', async (req, res) => {
 })
 
 // POST /users/register - CREATE new user
-router.post('/register', async (req, res) => {
+router.post('/register', uploads.single('image'), async (req, res) => {
   try {
     // check if user exists already
     const findUser = await db.User.findOne({
       email: req.body.email
     })
-
+    
     // don't allow emails to register twice
     if(findUser) return res.status(400).json({ msg: 'email exists already' })
-  
+    
+    
     // hash password
     const password = req.body.password
     const saltRounds = 12;
     const hashedPassword = await bcrypt.hash(password, saltRounds)
-  
+    
+    // upload profile photo
+    // console.log(req.body, req.file)
+    const uploadedResponse = await cloudinary.uploader.upload(req.file.path)
+    // console.log(uploadedResponse)
+
     // create new user
     const newUser = new db.User({
       username: req.body.username,
       email: req.body.email,
       password: hashedPassword,
-      image: req.body.image,
+      image: uploadedResponse.url,
       type: req.body.type,
       private: req.body.private,
       bio: req.body.bio      
@@ -51,6 +62,7 @@ router.post('/register', async (req, res) => {
     const token = await jwt.sign(payload, process.env.JWT_SECRET)
 
     res.json({ token })
+    unlinkSync(req.file.path)
   } catch (error) {
     console.log(error)
     res.status(500).json({ msg: 'server error'  })
