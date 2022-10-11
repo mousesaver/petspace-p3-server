@@ -22,6 +22,8 @@ const myMiddleWare = (req, res, next) => {
   res.locals.myData = 'some info'
   next()//okay express, go to the next thing
 }
+
+app.use(express.static('public'))
 // app.use(myMiddleWare)
 // app.use((req, res, next) => {
 //   console.log('hello from a middleware')
