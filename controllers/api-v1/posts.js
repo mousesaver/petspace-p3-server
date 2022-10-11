@@ -73,9 +73,7 @@ router.get('/:postid', async (req, res) => {
 router.post('/:postid/like', async (req, res) => {
     try {
         const post = await db.Post.findById(req.params.postid)
-        console.log(post)
         const user = await db.User.findById(req.body.userId)
-        console.log(user)
         const like = {user: user}
         post.likes.push(like)
         await post.save()
@@ -85,13 +83,13 @@ router.post('/:postid/like', async (req, res) => {
         res.status(500).json({ msg: 'server error'  })
     }
 })
-router.delete('/:postid/like', async (req, res) => {
+router.put('/:postid/like', async (req, res) => {
     try {
         const post = await db.Post.findById(req.params.postid)
-        const index = post.likes.findIndex((like) => {return like.user.id === req.body.userId})
+        const index = post.likes.findIndex((like) => {
+            return like.user == req.body.userId})
         post.likes.splice(index, 1)
         await post.save()
-        res.sendStatus(204)
         res.json(post)
     } catch(err) {
         console.log(err)
