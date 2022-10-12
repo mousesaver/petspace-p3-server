@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
         friendsAndUser.forEach((people) => {
             posts = posts.concat(people.posts)
         })
-        posts.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
+        posts.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1))
         res.json(posts)
     } catch (error) {
         console.log(error)
