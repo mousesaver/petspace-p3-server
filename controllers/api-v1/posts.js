@@ -38,7 +38,7 @@ router.post('/', uploads.single('image'), async (req, res) => {
     try {
       // create new user
       const user = await db.User.findById(req.body.userId)
-      console.log(req.body, req.file)
+    //   console.log(req.body, req.file)
       const uploadedResponse = await cloudinary.uploader.upload(req.file.path)
       console.log(uploadedResponse)
   
@@ -48,8 +48,10 @@ router.post('/', uploads.single('image'), async (req, res) => {
           photo: uploadedResponse.url     
       
       })
+      console.log(newPost.user)
       user.posts.push(newPost)
       await user.save()
+      console.log(user)
       res.status(201).json(newPost)
       unlinkSync(req.file.path)
     } catch (error) {
