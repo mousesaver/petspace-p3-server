@@ -118,6 +118,11 @@ router.put('/:postid', async (req, res) => {
 
 router.delete('/:postid', async (req, res) => {
     try {
+        post = await db.Post.findById(req.params.postid)
+        const userid = post.user
+        const foundUser = await db.User.findById(userid)
+        foundUser.posts.splice(foundUser.posts.indexOf(req.params.postid),1)
+        await foundUser.save()
         await db.Post.findByIdAndDelete(req.params.postid)
         res.sendStatus(204)
     } catch(err) {
