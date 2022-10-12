@@ -75,6 +75,8 @@ router.post('/:postid/like', async (req, res) => {
         const post = await db.Post.findById(req.params.postid)
         const user = await db.User.findById(req.body.userId)
         const like = {user: user}
+        user.likedposts.push(post)
+        await user.save()
         post.likes.push(like)
         await post.save()
         res.json(post)
@@ -88,8 +90,13 @@ router.put('/:postid/like', async (req, res) => {
         const post = await db.Post.findById(req.params.postid)
         const index = post.likes.findIndex((like) => {
             return like.user == req.body.userId})
+        const user = await db.User.findById(req.body.userId)
+        const indexLikedPost = user.likedposts.findIndex((likepost) => {
+            return likepost == post.id})
+        user.likedposts.splice(indexLikedPost, 1)
         post.likes.splice(index, 1)
         await post.save()
+        await user.save()
         res.json(post)
     } catch(err) {
         console.log(err)
@@ -126,7 +133,7 @@ router.post('/:postid/comments', async (req, res) => {
       const post = await db.Post.findById(req.params.postid).populate('user')
       post.comments = [newComment, ...post.comments]
       await post.save()
-      console.log(post)
+
       res.status(201).json(newComment)
     } catch (error) {
       console.log(error)
